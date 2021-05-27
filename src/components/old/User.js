@@ -1,24 +1,19 @@
-import React, { useEffect, Fragment } from 'react'
+import React, { Component, Fragment } from 'react'
 import Spinner from '../layout/Spinner'
 import {Link} from 'react-router-dom'
 import Repos from '../repos/Repos'
 
-const User = ({user,match,loading,repos,getRepos,getUser}) => {
-
-    useEffect(() => {
-        getUser(match.params.login)
-        getRepos(match.params.login)
-
-        // prevent warning appearing from react
-        // eslint-disable-next-line
-
-    },[]) //add [] to prevent the looping created
-
-   
+class User extends Component {
+     componentDidMount(){
+        //  calling the getUser function this.props.match... used to capture the parameter passed after the url
+         this.props.getUser(this.props.match.params.login)
+         this.props.getRepos(this.props.match.params.login)
+     }
 
 
- 
-        const {name,avatar_url,html_url,company,location,bio,blog,login,following,followers,public_repos,public_gists,hirable} = user
+    render() {
+        const {name,avatar_url,html_url,company,location,bio,blog,login,following,followers,public_repos,public_gists,hirable} = this.props.user;
+        const {loading,repos} = this.props
         if (loading) return <Spinner />
 
         return (
@@ -51,13 +46,6 @@ const User = ({user,match,loading,repos,getRepos,getUser}) => {
                             )}
                         </li>
                         <li>
-                            {location && (
-                                <Fragment>
-                                    <h5>{location}</h5>
-                                </Fragment>
-                            )}
-                        </li>
-                        <li>
                             {company && (
                                 <Fragment>
                                     <h5>{company}</h5>
@@ -83,6 +71,6 @@ const User = ({user,match,loading,repos,getRepos,getUser}) => {
             </Fragment>
         )
     }
-
+}
 
 export default User

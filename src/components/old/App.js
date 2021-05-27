@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React,{useState, Fragment} from 'react';
+import React,{Component, Fragment} from 'react';
 import './App.css';
 import Alert from './components/layout/Alert';
 import  Navbar from './components/layout/Navbar';
@@ -9,18 +9,16 @@ import {BrowserRouter as Router,Route,Switch} from 'react-router-dom'
 import About from './components/pages/About'
 import User from './components/users/User';
 
-import GithubState from './context/github/GithubState'
 
+class  App extends Component {
 
-const  App = () => {
-
-
-  const [users,setUsers] = useState([])
-  const [user,setUser] = useState({})
-  const [repos,setRepos] = useState([])
-  const [loading,setLoading] = useState(false)
-  const [alert,setAlert] = useState(null)
-
+  state = {
+    users: [],
+    user: {},
+    repos:[],
+    loading: false,
+    alert: null
+  }
 
   // async componentDidMount(){
 
@@ -33,78 +31,71 @@ const  App = () => {
   // }
 
 
-   const searchUsers =  async text => {
-    setLoading(true)
+   searchUsers =  async text => {
+    this.setState({loading:true});
     
     const res = await axios.get(`https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
     
-    setUsers(res.data.items)
-    setLoading(false)
+    this.setState({loading:false,users:res.data.items})
    }
 
-   const getUser = async username => {
-    setLoading(true)
+   getUser = async username => {
+    this.setState({loading:true});
     
     const res = await axios.get(`https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
     
-    setUser(res.data)
-    setLoading(false)
+    this.setState({loading:false,user:res.data})
    }
 
    
-   const getRepos = async username => {
-    setLoading(true)
+   getRepos = async username => {
+    this.setState({loading:true});
     
     const res = await axios.get(`https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
     
-    setRepos(res.data)
-    setLoading(false)
+    this.setState({loading:false,repos:res.data})
    }
 
-  const  showAlert =(msg,type) => {
-      setAlert({msg:msg,type:type})
+   setAlert =(msg,type) => {
+      this.setState({alert:{msg:msg,type:type}})
       setTimeout(() => {
-        setAlert(null)
+        this.setState({alert:null})
       }, 5000);
    }
 
 
-   const clearUsers = () => {
-     setUsers('')
-     setLoading(false)
-  }
+   clearUsers = () => this.setState({users:[],loading:false})
 
 
 
-
-
+  render(){
+    const {loading,users,user,repos} = this.state
   return (
-    <GithubState>
     <Router>
     <div className="App">
           <Navbar title="Github Finder" icon="fab fa-github" />
           <div className="container">
-          <Alert alert={alert}/>
+          <Alert alert={this.state.alert}/>
           <Switch>
             <Route exact path="/" render={props=>(
              <Fragment>
-              <Search searchUser={searchUsers} clearUser={clearUsers} setAlert={showAlert} showClear={users.length > 0 ? true : false} />
+              <Search searchUser={this.searchUsers} clearUser={this.clearUsers} setAlert={this.setAlert} showClear={users.length > 0 ? true : false} />
               <Users loading={loading} users={users} />
              </Fragment>
             )}>
             </Route>
             <Route path="/about" component={About} ></Route>
             <Route exact path="/user/:login" render={props=>(
-              <User getRepos={getRepos} repos={repos}  {...props} getUser={getUser} user={user} loading={loading} />
+              <User getRepos={this.getRepos} repos={repos}  {...props} getUser={this.getUser} user={user} loading={this.loading} />
             )}></Route>
           </Switch>
           
           </div>
     </div>
     </Router>
-    </GithubState>
+ 
   );
   }
-
+}
 
 export default App;

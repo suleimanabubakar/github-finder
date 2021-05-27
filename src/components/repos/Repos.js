@@ -1,6 +1,7 @@
-import Repo from "./repo";
+import Repo from "../repos/Repo";
 
-const Repos = ([repos]) => {
+
+const Repos = ({repos}) => {
 
     return repos.map(repo=> <Repo repo={repo} key={repo.id} /> )
 

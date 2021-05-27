@@ -1,6 +1,9 @@
+import {Link} from 'react-router-dom'
 const Repo = ({repo}) => {
     return ( 
-       <Link class="text-danger" to=""></Link>
+  <div className="card bg-light">
+      <a href={repo.html_url}>{repo.name}</a>
+  </div>
      );
 }
  
